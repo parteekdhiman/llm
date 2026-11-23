@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parteek-own-llm"
+version = "0.1.0"
+description = "Train a small English/Hindi conversational LLM from random weights"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Parteek Dhiman"}]
+dependencies = [
+  "torch>=2.3,<3",
+  "numpy>=1.26,<3",
+  "sentencepiece>=0.2,<1",
+  "pypdf>=5,<7",
+  "scikit-learn>=1.5,<2",
+  "tqdm>=4.66,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
