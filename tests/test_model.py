@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import torch
 
+from parteek_llm.chat import resolve_max_new_tokens
 from parteek_llm.config import ModelConfig
 from parteek_llm.model import ParteekLLM
 
@@ -48,4 +49,10 @@ def test_generation_adds_tokens() -> None:
     prompt = torch.tensor([[2, 10, 11]])
     output = model.generate(prompt, max_new_tokens=4, temperature=0)
     assert output.shape == (1, 7)
+
+
+def test_chat_generation_limit_respects_model_block_size() -> None:
+    assert resolve_max_new_tokens(128, 64) == 63
+    assert resolve_max_new_tokens(16, 64) == 16
+    assert resolve_max_new_tokens(0, 64) == 1
 

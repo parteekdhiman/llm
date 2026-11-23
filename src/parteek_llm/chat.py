@@ -21,6 +21,12 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def resolve_max_new_tokens(requested: int, block_size: int) -> int:
+    if block_size < 2:
+        raise ValueError("model block_size must be at least 2")
+    return max(1, min(requested, block_size - 1))
+
+
 def main() -> None:
     args = build_parser().parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -28,6 +34,7 @@ def main() -> None:
     model, payload = load_model_from_checkpoint(args.checkpoint, device)
     if model.config.vocab_size != tokenizer.vocab_size:
         raise ValueError("Checkpoint and tokenizer vocabulary sizes do not match")
+    max_new_tokens = resolve_max_new_tokens(args.max_new_tokens, model.config.block_size)
     model.eval()
     history: list[Message] = []
     print(f"Loaded step {payload['step']:,} on {device}.")
@@ -54,7 +61,7 @@ def main() -> None:
             tokenizer,
             history,
             system_prompt=args.system,
-            max_new_tokens=args.max_new_tokens,
+            max_new_tokens=max_new_tokens,
             temperature=args.temperature,
             top_k=args.top_k,
             top_p=args.top_p,
